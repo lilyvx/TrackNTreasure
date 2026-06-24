@@ -1,6 +1,24 @@
-import React from 'react';
-import RootNavigator from './src/navigation/RootNavigator';
+import 'react-native-gesture-handler'; 
+import React, { useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { AuthNavigator } from './src/navigation/AuthNavigator';
 
-export default function App() {
-  return <RootNavigator />;
-}
+
+const App = () => {
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  return (
+    <NavigationContainer>
+     
+      {!isAuthenticated ? (
+        <AuthNavigator />
+      ) : (
+        /* placeholder for app navigator */
+        null 
+      )}
+    </NavigationContainer>
+  );
+};
+
+export default App;
