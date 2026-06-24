@@ -1,10 +1,18 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 
-export default function WelcomeScreen() {
+const WelcomeScreen = ({ navigation }: any) => {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Welcome Screen</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome to TracknTreasure</Text>
+      <Button title="Go to Login" onPress={() => navigation.navigate('Login')} />
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+});
+
+export default WelcomeScreen;
