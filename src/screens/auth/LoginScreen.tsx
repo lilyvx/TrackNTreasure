@@ -1,10 +1,18 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 
-export default function LoginScreen() {
+const LoginScreen = ({ navigation }: any) => {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Login Screen</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Login Screen</Text>
+      <Button title="Login" onPress={() => navigation.navigate('Dashboard')} />
     </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+});
+
+export default LoginScreen;
