@@ -1,22 +1,69 @@
-import 'react-native-gesture-handler';
-import React, { useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { AuthNavigator } from './src/navigation/AuthNavigator';
-import { DrawerNavigator } from './src/navigation/DrawerNavigator';
+// App.tsx
+import React, { useEffect } from 'react';
+import { SafeAreaView, StyleSheet, StatusBar, View, Alert } from 'react-native';
+import { initDatabase, insertTransaction } from './src/database/db';
+import { connectWebSocket, sendTransactionEvent } from './src/services/WebSocket';
+import { TransactionForm } from './src/components/TransactionForm';
+import { TransactionFormState } from './src/types';
 
 const App = () => {
-  
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  //hardcode session id for testing
+  const CURRENT_USER_ID = 1;
+
+  useEffect(() => {
+    const startupPipeline = async () => {
+      try {
+        //init sql schema
+        await initDatabase();
+        
+        //open network stream
+        connectWebSocket(CURRENT_USER_ID, (incomingData) => {
+          console.log('Live data broadcast caught:', incomingData);
+        });
+
+      } catch (error) {
+        console.error('Initialization error during boot sequence:', error);
+      }
+    };
+
+    startupPipeline();
+  }, []);
+
+  //supervisor catching data from form
+  const handleSaveTransaction = async (formData: TransactionFormState) => {
+    try {
+      //write to local memory
+      const savedTransaction = await insertTransaction(CURRENT_USER_ID, formData);
+      console.log('Transaction committed safely to SQLite database:', savedTransaction);
+
+      //broadcast the updated package up to server engine 
+      sendTransactionEvent('TRANSACTION_ADDED', savedTransaction);
+
+      Alert.alert('Success', 'Entry saved');
+    } catch (error: any) {
+      console.error('Pipeline process broke down:', error);
+      Alert.alert('System Error', 'Could not process the transaction event.');
+    }
+  };
 
   return (
-    <NavigationContainer>
-      {!isAuthenticated ? (
-        <AuthNavigator />
-      ) : (
-        <DrawerNavigator />
-      )}
-    </NavigationContainer>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#4a0006" />
+      <View style={styles.formWrapper}>
+        <TransactionForm onSave={handleSaveTransaction} />
+      </View>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { 
+    flex: 1, 
+    backgroundColor: '#4a0006' 
+  },
+  formWrapper: { 
+    flex: 1 
+  },
+});
 
 export default App;
