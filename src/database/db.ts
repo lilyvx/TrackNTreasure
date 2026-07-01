@@ -1,6 +1,6 @@
 //local db
 import SQLite from 'react-native-sqlite-storage';
-import { Transaction, TransactionFormState, User} from '../types';
+import { Transaction, TransactionFormState, User, WalletSummary} from '../types';
 
 // promise api so can use async/await with your database operations
 SQLite.enablePromise(true);
@@ -13,7 +13,7 @@ export const getDBConnection = async (): Promise<SQLite.SQLiteDatabase> => {
     return dbInstance;
   }
   
-  dbInstance = await SQLite.openDatabase({
+  dbInstance = await SQLite.openDatabase({ //pause before promise runs 
     name: 'TrackNTreasure.db',
     location: 'default',
   });
@@ -197,3 +197,44 @@ export const insertTransaction = async (
     transaction_date: form.transaction_date,
   };
 };
+
+
+export const getWalletSummary = async (user_id: number): Promise<WalletSummary> => {
+  const db = await getDBConnection();
+  
+  const [summaryResults] = await db.executeSql(
+    `SELECT
+       COALESCE(SUM(CASE WHEN type = 'Income'  THEN amount ELSE 0 END), 0) AS total_income,
+       COALESCE(SUM(CASE WHEN type = 'Expense' THEN amount ELSE 0 END), 0) AS total_expenses
+     FROM transactions WHERE user_id = ?`,
+    [user_id]
+  );
+
+  const total_income = summaryResults.rows.item(0).total_income ?? 0;
+  const total_expenses = summaryResults.rows.item(0).total_expenses ?? 0;
+
+  const [budgetResults] = await db.executeSql(
+    `SELECT monthly_budget_limit FROM budgets WHERE user_id = ?`,
+    [user_id]
+  );
+
+  const budget_limit = budgetResults.rows.length > 0 ? budgetResults.rows.item(0).monthly_budget_limit : 0;
+  const remaining_budget = budget_limit - total_expenses;
+
+  return {
+    current_balance: total_income - total_expenses,
+    total_income,
+    total_expenses,
+    remaining_budget,
+  };
+};
+
+export const upsertBudget = async (user_id: number, monthly_budget_limit: number): Promise<void> => {
+  const db = await getDBConnection();
+  await db.executeSql(
+    `INSERT OR REPLACE INTO budgets (user_id, monthly_budget_limit) VALUES (?, ?)`,
+    [user_id, monthly_budget_limit]
+  );
+};
+
+

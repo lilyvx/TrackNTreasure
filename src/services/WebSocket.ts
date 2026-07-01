@@ -24,6 +24,7 @@ export const connectWebSocket = (
 
     wsClient.onclose = () => {
     console.log('[DISCONNECTED] Disconnected from server. Reconnecting...');
+    wsClient = null; //Resetting instance variable to prevent stacking loops
     //reconnect logic loop
     setTimeout(() => connectWebSocket(userId, onMessageReceived), 5000);
   };
@@ -43,4 +44,4 @@ export const sendTransactionEvent = (type: 'TRANSACTION_ADDED' | 'TRANSACTION_DE
   } else {
     console.warn('WebSocket connection is offline.');
   }
-};        
+};

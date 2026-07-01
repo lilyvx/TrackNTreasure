@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import {StyleSheet,View,Text,TextInput,TouchableOpacity, ScrollView,Alert,} from 'react-native';
+import React, { useState, useRef } from 'react';
+import {StyleSheet,View,Text,TextInput,TouchableOpacity, ScrollView,Alert,StatusBar,Platform} from 'react-native';
 import { TransactionFormState, TransactionType, TransactionCategory } from '../types';
 
 //constant match type definition
@@ -20,6 +20,8 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
     transaction_date: new Date().toISOString().split('T')[0], // Formats to 'YYYY-MM-DD'
   });
 
+  const inputRef = useRef<TextInput>(null);
+
   const handleInputChange = (field: keyof TransactionFormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     
@@ -30,11 +32,11 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
   };
 
   const handleSubmit = () => {
-    const { amount, description, category, type } = form;
+    const { amount, description, category } = form;
 
     //submission checking
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      Alert.alert('ERROR: ' ,'You have to enter an amount to log a transaction.');
+      Alert.alert('ERROR: ' ,'You have to enter an amount to record a transaction.');
       return;
     }
     if (!category) {
@@ -49,7 +51,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
     //pass validated form state to wrapper to execute db & server write
     onSave(form);
     
-    // Clear inputs smoothly
+    //clear inputs smoothly
     setForm({
       amount: '',
       description: '',
@@ -63,12 +65,13 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Log Ledger Entry</Text>
+      {/* Dynamic Status Bar injection forces system header matching */}
+      <StatusBar backgroundColor="#0d0d0d" barStyle="light-content" translucent={false} />
 
-      //transaction toggle button
+      {/* transaction toggle button */}
       <Text style={styles.label}>Flow Type</Text>
       <View style={styles.toggleRow}>
-        {(['Expense', 'Income'] as TransactionType[]).map((t) => (
+        {['Expense', 'Income'].map((t) => (
           <TouchableOpacity
             key={t}
             style={[
@@ -84,18 +87,22 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
         ))}
       </View>
 
-      //input amount
-      <Text style={styles.label}>Amount (MYR)</Text>
+      {/* input amount */}
+      <Text style={styles.label}>Amount</Text>
+      <TouchableOpacity style={styles.amountCard} activeOpacity={0.8} onPress={() => inputRef.current?.focus()}>
+        <Text style={styles.amountCurrency}>RM </Text>
+        <Text style={styles.amountValue}>{form.amount || '0.00'}</Text>
+      </TouchableOpacity>
+
       <TextInput
-        style={styles.input}
+        ref={inputRef}
+        style={styles.hiddenInput}
         keyboardType="numeric"
-        placeholder="0.00"
-        placeholderTextColor="#888888"
         value={form.amount}
         onChangeText={(val) => handleInputChange('amount', val)}
       />
 
-      //category selection 
+      {/* category selection */}
       <Text style={styles.label}>Category</Text>
       <View style={styles.chipContainer}>
         {activeCategories.map((cat) => (
@@ -111,7 +118,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
         ))}
       </View>
 
-      //description input
+      {/* description input */}
       <Text style={styles.label}>Description</Text>
       <TextInput
         style={[styles.input, styles.textArea]}
@@ -123,40 +130,34 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
         onChangeText={(val) => handleInputChange('description', val)}
       />
 
-      //submit button
+      {/* submit button */}
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Commit Entry</Text>
+        <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 24, backgroundColor: '#4a0006', flexGrow: 1 },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#ffffff', marginBottom: 24, textAlign: 'center' },
-  label: { fontSize: 14, color: '#cccccc', fontWeight: '600', marginBottom: 8, marginTop: 12 },
-  input: {
-    backgroundColor: '#300004',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    color: '#ffffff',
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#6b000a',
-  },
+  container: { padding: 24, backgroundColor: '#0d0d0d', flexGrow: 1 },
+  label: { fontFamily: Platform.OS === 'ios' ? 'Helvetica Neue' : 'sans-serif-medium', fontSize: 12, color: '#888888', fontWeight: '600', marginBottom: 8, marginTop: 14, letterSpacing: 1, textTransform: 'uppercase' },
+  input: { fontFamily: Platform.OS === 'ios' ? 'Helvetica Neue' : 'sans-serif-normal', backgroundColor: '#1a1a1a', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, color: '#ffffff', fontSize: 16, borderWidth: 1, borderColor: '#262626' },
+  amountCard: { flexDirection: 'row', backgroundColor: '#1a1a1a', borderRadius: 16, paddingVertical: 32, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#262626', marginBottom: 12 },
+  amountCurrency: { fontFamily: Platform.OS === 'ios' ? 'HelveticaNeue-CondensedBold' : 'sans-serif-condensed', fontSize: 32, fontWeight: 'bold', color: '#666666' },
+  amountValue: { fontFamily: Platform.OS === 'ios' ? 'HelveticaNeue-CondensedBold' : 'sans-serif-condensed', fontSize: 44, fontWeight: 'bold', color: '#ffffff', letterSpacing: 0.5 },
+  hiddenInput: { position: 'absolute', width: 0, height: 0, opacity: 0 },
   textArea: { height: 80, textAlignVertical: 'top' },
-  toggleRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  toggleButton: { flex: 1, paddingVertical: 12, backgroundColor: '#300004', borderRadius: 8, alignItems: 'center', borderWidth: 1, borderColor: '#6b000a' },
-  toggleText: { color: '#aaaaaa', fontSize: 16, fontWeight: '600' },
-  activeToggleText: { color: '#ffffff' },
-  activeExpense: { backgroundColor: '#b30006', borderColor: '#ff333a' },
-  activeIncome: { backgroundColor: '#006622', borderColor: '#33cc66' },
+  toggleRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
+  toggleButton: { flex: 1, paddingVertical: 14, backgroundColor: '#1a1a1a', borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: '#262626' },
+  toggleText: { fontFamily: Platform.OS === 'ios' ? 'HelveticaNeue-Medium' : 'sans-serif-condensed', color: '#666666', fontSize: 15, fontWeight: '600', letterSpacing: 0.5 },
+  activeToggleText: { color: '#ffffff', fontWeight: 'bold' },
+  activeExpense: { backgroundColor: '#261416', borderColor: '#ff4444' },
+  activeIncome: { backgroundColor: '#132417', borderColor: '#8ce629' },
   chipContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
-  chip: { paddingHorizontal: 14, paddingVertical: 8, backgroundColor: '#300004', borderRadius: 20, borderWidth: 1, borderColor: '#6b000a' },
-  activeChip: { backgroundColor: '#ffffff', borderColor: '#ffffff' },
-  chipText: { color: '#cccccc', fontSize: 14 },
-  activeChipText: { color: '#4a0006', fontWeight: 'bold' },
-  submitButton: { backgroundColor: '#ffffff', borderRadius: 8, paddingVertical: 16, alignItems: 'center', marginTop: 28, elevation: 2 },
-  submitButtonText: { color: '#4a0006', fontSize: 18, fontWeight: 'bold' },
+  chip: { paddingHorizontal: 14, paddingVertical: 8, backgroundColor: '#1a1a1a', borderRadius: 20, borderWidth: 1, borderColor: '#262626' },
+  activeChip: { backgroundColor: '#8ce629', borderColor: '#8ce629' },
+  chipText: { fontFamily: Platform.OS === 'ios' ? 'Helvetica Neue' : 'sans-serif-condensed', color: '#888888', fontSize: 14 },
+  activeChipText: { color: '#0d0d0d', fontWeight: 'bold' },
+  submitButton: { backgroundColor: '#8ce629', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 28 },
+  submitButtonText: { fontFamily: Platform.OS === 'ios' ? 'HelveticaNeue-Bold' : 'sans-serif-condensed', color: '#0d0d0d', fontSize: 16, fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
 });
