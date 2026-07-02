@@ -1,19 +1,19 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
+import TabNavigator from './TabNavigator'; 
 
-import WelcomeScreen from '../screens/auth/WelcomeScreen';
-import LoginScreen from '../screens/auth/LoginScreen';
+const Stack = createStackNavigator();
 
-const Stack = createNativeStackNavigator();
-
-export default function RootNavigator() {
+export const RootNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
+        {/*tabs are now set up as the root entry point */}
+        <Stack.Screen name="MainApp" component={TabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
+
+export default RootNavigator;

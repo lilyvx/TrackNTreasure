@@ -116,4 +116,15 @@ dependencies {
     }
 }
 
+
+// Force Gradle to ignore the AGP 8.6.0 version requirement error for AAR metadata
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'androidx.core' && details.requested.name.startsWith('core')) {
+            // Force the library version down to 1.13.1 so it compiles perfectly with AGP 8.1.4
+            details.useVersion '1.13.1'
+        }
+    }
+}
+
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

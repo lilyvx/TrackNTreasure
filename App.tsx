@@ -1,4 +1,4 @@
-// App.tsx
+import RootNavigator from './src/navigation/RootNavigator';
 import React, { useEffect } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, View, Alert } from 'react-native';
 import { initDatabase, insertTransaction } from './src/database/db';
@@ -47,23 +47,17 @@ const App = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#4a0006" />
-      <View style={styles.formWrapper}>
-        <TransactionForm onSave={handleSaveTransaction} />
-      </View>
-    </SafeAreaView>
-  );
+  <SafeAreaView style={{ flex: 1, backgroundColor: '#0d0d0d' }}>
+    <StatusBar barStyle="light-content" backgroundColor="#0d0d0d" />
+    {/* The master router now controls the view flow */}
+    <RootNavigator />
+  </SafeAreaView>
+);
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#4a0006' 
-  },
-  formWrapper: { 
-    flex: 1 
-  },
+  container: { flex: 1, backgroundColor: '#0d0d0d' },
+  formWrapper: { flex: 1 },
 });
 
 export default App;
