@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert, KeyboardAvoidingView, Platform, StatusBar, ScrollView, TouchableOpacity} from 'react-native';
-import AppLogo from "../../components/AppLogo";
+import AppLogo from "../../components/AppLogo"; 
 import AuthInput from "../../components/AuthInput";
 import AuthButton from "../../components/AuthButton";
+import {getDBConnection} from '../../database/db'; 
 
 interface LoginFormState {
   identifier: string;
@@ -19,11 +20,12 @@ const LoginScreen = ({ navigation }: any) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const { identifier, password } = formState;
 
+    //validation checks
     if (!identifier.trim()) {
-      Alert.alert('ERROR', 'Please enter your email or username.');
+      Alert.alert('ERROR', 'Please enter an email or username.');
       return;
     }
     if (!password) {
@@ -31,8 +33,34 @@ const LoginScreen = ({ navigation }: any) => {
       return;
     }
 
-    // TODO: Replace with real SQLite / API auth check
-    navigation.navigate('Dashboard');
+    try {
+      //get db instance
+      const db = await getDBConnection();
+      
+      //query users table using the promise api execution line
+      const [results] = await db.executeSql(
+        `SELECT * FROM users WHERE (username = ? OR email = ?) AND password = ? LIMIT 1`,
+        [identifier.trim(), identifier.trim(), password]
+      );
+
+      //check authentication matching output state
+      if (results.rows.length > 0) {
+        const loggedInUser = results.rows.item(0);
+        console.log('Login successful! User ID:', loggedInUser.user_id);
+
+        //clear input form tracking state completely
+        setFormState({ identifier: '', password: '' });
+
+        //direct navigation to dashboard
+        //pass user id so dashboard can query the specific user data
+        navigation.navigate('Dashboard', { userId: loggedInUser.user_id });
+      } else {
+        Alert.alert('Login failed', 'Incorrect email or password');
+      }
+    } catch (error) {
+      console.error('Database query authentication error:', error);
+      Alert.alert('Database Error', 'Unable to reach local data tables. Try restarting the application.');
+    }
   };
 
   return (
@@ -46,9 +74,9 @@ const LoginScreen = ({ navigation }: any) => {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <AppLogo />
+        <AppLogo /> 
 
-        {/* Form card */}
+        {/*formcard*/}
         <View style={styles.formCard}>
           <AuthInput
             label="Email or Username"
@@ -67,7 +95,7 @@ const LoginScreen = ({ navigation }: any) => {
           <AuthButton label="Log In" onPress={handleLogin} />
         </View>
 
-        {/* Register link */}
+        {/*register link*/}
         <View style={styles.registerRow}>
           <Text style={styles.registerPrompt}>Don't have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>

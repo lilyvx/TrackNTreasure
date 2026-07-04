@@ -1,18 +1,23 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import TabNavigator from './TabNavigator'; 
+import LoginScreen from '../screens/auth/LoginScreen'; 
+import DashboardScreen from '../screens/dashboard/DashboardScreen'; 
+import AddTransactionScreen from '../screens/transactions/AddTransactionScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
 
 const Stack = createStackNavigator();
 
-export const RootNavigator = () => {
+const RootNavigator = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {/*tabs are now set up as the root entry point */}
-        <Stack.Screen name="MainApp" component={TabNavigator} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator
+      initialRouteName="Login"
+      screenOptions={{ headerShown: false, cardStyle: { backgroundColor: '#0d0d0d' } }}
+    >
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Dashboard" component={DashboardScreen} />
+      <Stack.Screen name="TransactionForm" component={AddTransactionScreen} />
+      <Stack.Screen name="Register"component={RegisterScreen} />  
+    </Stack.Navigator>
   );
 };
 

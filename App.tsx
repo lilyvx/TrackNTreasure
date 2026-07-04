@@ -1,63 +1,40 @@
-import RootNavigator from './src/navigation/RootNavigator';
 import React, { useEffect } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, View, Alert } from 'react-native';
-import { initDatabase, insertTransaction } from './src/database/db';
-import { connectWebSocket, sendTransactionEvent } from './src/services/WebSocket';
-import { TransactionForm } from './src/components/TransactionForm';
-import { TransactionFormState } from './src/types';
+import { Alert, LogBox } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import RootNavigator from './src/navigation/RootNavigator'; 
+import { initDatabase } from './src/database/db';
 
-const App = () => {
-  //hardcode session id for testing
-  const CURRENT_USER_ID = 1;
+//ignore log notifications in the app for testing environment if needed
+LogBox.ignoreLogs(['LOG  Database connected successfully!']);
 
+function App(): React.JSX.Element {
+  
   useEffect(() => {
-    const startupPipeline = async () => {
+    const setupApp = async () => {
       try {
-        //init sql schema
+        //run db schema setup on initialization  
         await initDatabase();
-        
-        //open network stream
-        connectWebSocket(CURRENT_USER_ID, (incomingData) => {
-          console.log('Live data broadcast caught:', incomingData);
-        });
-
+        console.log('🎉 Application ready: Database tables is fully online.');
       } catch (error) {
-        console.error('Initialization error during boot sequence:', error);
+        console.error('CRITICAL: App setup failed:', error);
+        Alert.alert(
+          'System Initialize Error',
+          'Could not initialize the local database file. Please clear storage and try again.'
+        );
       }
     };
 
-    startupPipeline();
+    setupApp();
   }, []);
 
-  //supervisor catching data from form
-  const handleSaveTransaction = async (formData: TransactionFormState) => {
-    try {
-      //write to local memory
-      const savedTransaction = await insertTransaction(CURRENT_USER_ID, formData);
-      console.log('Transaction committed safely to SQLite database:', savedTransaction);
-
-      //broadcast the updated package up to server engine 
-      sendTransactionEvent('TRANSACTION_ADDED', savedTransaction);
-
-      Alert.alert('Success', 'Entry saved');
-    } catch (error: any) {
-      console.error('Pipeline process broke down:', error);
-      Alert.alert('System Error', 'Could not process the transaction event.');
-    }
-  };
-
   return (
-  <SafeAreaView style={{ flex: 1, backgroundColor: '#0d0d0d' }}>
-    <StatusBar barStyle="light-content" backgroundColor="#0d0d0d" />
-    {/* The master router now controls the view flow */}
-    <RootNavigator />
-  </SafeAreaView>
-);
-};
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0d0d0d' },
-  formWrapper: { flex: 1 },
-});
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+    </SafeAreaProvider>
+  );
+}
 
 export default App;

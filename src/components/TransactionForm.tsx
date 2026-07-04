@@ -161,3 +161,5 @@ const styles = StyleSheet.create({
   submitButton: { backgroundColor: '#8ce629', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 28 },
   submitButtonText: { fontFamily: Platform.OS === 'ios' ? 'HelveticaNeue-Bold' : 'sans-serif-condensed', color: '#0d0d0d', fontSize: 16, fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
 });
+
+export default TransactionForm;
