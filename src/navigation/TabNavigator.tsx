@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View } from 'react-native';
 import DashboardScreen from '../screens/dashboard/DashboardScreen';
 import AddTransactionScreen from '../screens/transactions/AddTransactionScreen';
+import HistoryScreen from '../screens/transactions/HistoryScreen';
 
 //temporary placeholder for history and profile page
 const HistoryPlaceholder = () => (
@@ -47,13 +48,14 @@ const TabNavigator = ({ route }: any) => {
         name="Home" 
         component={DashboardScreen} 
         initialParams={{ userId }} //pass user session id to the dashboard calculations
-        options={{ tabBarLabel: 'Dashboard' }}
+        options={{ tabBarLabel: 'Home' }}
       />
       <Tab.Screen 
         name="History" 
-        component={HistoryPlaceholder} 
-        options={{ tabBarLabel: 'History' }}
-      />
+        component={HistoryScreen} 
+        initialParams={{ userId }} 
+        options={{ tabBarLabel: 'History' }} />
+        
       <Tab.Screen 
         name="Add" 
         component={AddTransactionScreen} 
