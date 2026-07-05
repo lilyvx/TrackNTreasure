@@ -53,7 +53,7 @@ const LoginScreen = ({ navigation }: any) => {
 
         //direct navigation to dashboard
         //pass user id so dashboard can query the specific user data
-        navigation.navigate('Dashboard', { userId: loggedInUser.user_id });
+        navigation.navigate('MainTabs', { userId: loggedInUser.user_id });
       } else {
         Alert.alert('Login failed', 'Incorrect email or password');
       }
