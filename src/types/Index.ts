@@ -18,7 +18,7 @@ export type TransactionType = 'Income' | 'Expense';
 
 export type IncomeCategory = 'Salary' | 'Bonus' | 'Investment'| "Gifted";
 
-export type ExpenseCategory =| 'Food'| 'Transportation'| 'Shopping'| 'Entertainment'| 'Bills'| 'Education'| 'Gift to others'| 'Groceries' ;
+export type ExpenseCategory =| 'Food'| 'Transportation'| 'Shopping'| 'Entertainment'| 'Bills'| 'Education'| 'Gift to others'| 'Groceries' |'Others' ;
 
 export type TransactionCategory = IncomeCategory | ExpenseCategory;
 

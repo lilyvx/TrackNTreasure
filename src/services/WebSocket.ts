@@ -52,3 +52,11 @@ export const sendTransactionEvent = (type: 'TRANSACTION_ADDED' | 'TRANSACTION_DE
     console.warn('WebSocket connection is offline.');
   }
 };
+
+export const sendWebSocketMessage = (message: any) => {
+    if (wsClient && wsClient.readyState === WebSocket.OPEN) {
+        wsClient.send(JSON.stringify(message));
+    } else {
+        console.warn('WebSocket connection is offline.');
+    }
+};

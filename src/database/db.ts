@@ -136,10 +136,13 @@ export const createTransaction = async (transaction: Omit<Transaction, 'transact
   return result.insertId; //auto increment trans id to trasactionaction
 };
 
+
 export const getTransactionsByUser = async (user_id: number): Promise<Transaction[]> => {
   const db = await getDBConnection();
+  
+  // CHANGED: Added transaction_id DESC to ensure newest items on the same day sit at the very top
   const [results] = await db.executeSql(
-    `SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_date DESC`,
+    `SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_date DESC, transaction_id DESC`,
     [user_id]
   );
   
@@ -149,6 +152,8 @@ export const getTransactionsByUser = async (user_id: number): Promise<Transactio
   }
   return transactions;
 };
+
+
 
 export const deleteTransaction = async (transaction_id: number, user_id: number): Promise<void> => {
   const db = await getDBConnection();
@@ -234,6 +239,30 @@ export const upsertBudget = async (user_id: number, monthly_budget_limit: number
   await db.executeSql(
     `INSERT OR REPLACE INTO budgets (user_id, monthly_budget_limit) VALUES (?, ?)`,
     [user_id, monthly_budget_limit]
+  );
+};
+
+export const getBudgetByUser = async (user_id: number): Promise<{ monthly_limit: number } | null> => {
+  const db = await getDBConnection();
+  const [results] = await db.executeSql(
+    `SELECT monthly_budget_limit FROM budgets WHERE user_id = ?`,
+    [user_id]
+  );
+  
+  if (results.rows.length > 0) {
+    return {
+
+      monthly_limit: results.rows.item(0).monthly_budget_limit
+    };
+  }
+  return null;
+};
+
+export const updateBudgetLimit = async (user_id: number, monthly_limit: number): Promise<void> => {
+  const db = await getDBConnection();
+  await db.executeSql(
+    `INSERT OR REPLACE INTO budgets (user_id, monthly_budget_limit) VALUES (?, ?)`,
+    [user_id, monthly_limit]
   );
 };
 

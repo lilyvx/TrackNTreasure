@@ -1,19 +1,36 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import TransactionForm from '../../components/TransactionForm';
+import { sendTransactionEvent } from '../../services/WebSocket'; 
+// 1. Import your exact database helper function
+import { insertTransaction } from '../../database/db'; // Make sure this path matches where your db file lives!
 
 const AddTransactionScreen = ({ navigation }: any) => {
-  
-  const handleSaveTransaction = (formData: any) => {
-    console.log('Saving transaction data to DB:', formData);
+  const USER_ID = 1; // Change this to your active global/logged-in user ID variable if needed
 
-    //go back to dashboard
-    navigation.goBack();
+  // 2. Make the handler async to wait for the local SQLite write
+  const handleSaveTransaction = async (formData: any) => {
+    console.log('Initiating database save for transaction:', formData);
+
+    try {
+      // 3. Await the local hardware database write using your helper
+      const savedTransaction = await insertTransaction(USER_ID, formData);
+      console.log('Successfully saved to local SQLite:', savedTransaction);
+
+      // 4. Broadcast the live event over WebSockets using the real saved object data
+      sendTransactionEvent('TRANSACTION_ADDED', savedTransaction);
+
+      // 5. Navigate back. The dashboard's focus hook will now read the updated DB values!
+      navigation.goBack();
+
+    } catch (error) {
+      console.error('Failed to execute local transaction insert:', error);
+      Alert.alert('Database Error', 'Could not save your transaction. Please try again.');
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/*pass the required onSave function down to component */}
       <TransactionForm onSave={handleSaveTransaction} />
     </View>
   );

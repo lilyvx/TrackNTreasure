@@ -4,7 +4,7 @@ import { TransactionFormState, TransactionType, TransactionCategory } from '../t
 
 //constant match type definition
 const INCOME_CATEGORIES: TransactionCategory[] = ['Salary', 'Bonus', 'Investment', 'Gifted'];
-const EXPENSE_CATEGORIES: TransactionCategory[] = ['Food', 'Transportation', 'Shopping', 'Entertainment', 'Bills', 'Education', 'Gift to others', 'Groceries'];
+const EXPENSE_CATEGORIES: TransactionCategory[] = ['Food', 'Transportation', 'Shopping', 'Entertainment', 'Bills', 'Education', 'Gift to others', 'Groceries', 'Others'];
 
 interface TransactionFormProps {
   onSave: (formData: TransactionFormState) => void;
@@ -65,11 +65,10 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Dynamic Status Bar injection forces system header matching */}
       <StatusBar backgroundColor="#0d0d0d" barStyle="light-content" translucent={false} />
 
       {/* transaction toggle button */}
-      <Text style={styles.label}>Flow Type</Text>
+      <Text style={styles.label}>Transaction Type</Text>
       <View style={styles.toggleRow}>
         {['Expense', 'Income'].map((t) => (
           <TouchableOpacity

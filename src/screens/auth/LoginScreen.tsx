@@ -59,7 +59,7 @@ const LoginScreen = ({ navigation }: any) => {
       }
     } catch (error) {
       console.error('Database query authentication error:', error);
-      Alert.alert('Database Error', 'Unable to reach local data tables. Try restarting the application.');
+      Alert.alert('Error', 'Unable to reach local data tables. Try restarting the application.');
     }
   };
 
