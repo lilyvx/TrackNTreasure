@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, StatusBar, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { getBudgetByUser, updateBudgetLimit } from '../../database/db';
 
-export const BudgetScreen: React.FC<{ navigation?: any }> = ({ navigation }) => {
-  const CURRENT_USER_ID = 1;
+export const BudgetScreen: React.FC<{ navigation?: any; route?: any }> = ({ navigation, route }) => {
+  const CURRENT_USER_ID = route?.params?.userId ?? 1;
   const [limit, setLimit] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 

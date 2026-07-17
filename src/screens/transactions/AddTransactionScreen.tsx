@@ -5,8 +5,9 @@ import { sendTransactionEvent } from '../../services/WebSocket';
 // 1. Import your exact database helper function
 import { insertTransaction } from '../../database/db'; // Make sure this path matches where your db file lives!
 
-const AddTransactionScreen = ({ navigation }: any) => {
-  const USER_ID = 1; // Change this to your active global/logged-in user ID variable if needed
+const AddTransactionScreen = ({ navigation, route }: any) => {
+  // Read real userId passed from TabNavigator via initialParams
+  const USER_ID = route?.params?.userId ?? 1;
 
   // 2. Make the handler async to wait for the local SQLite write
   const handleSaveTransaction = async (formData: any) => {
