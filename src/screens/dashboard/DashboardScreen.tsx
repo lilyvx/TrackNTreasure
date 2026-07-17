@@ -114,7 +114,7 @@ export const DashboardScreen: React.FC<{ navigation?: any }> = ({ navigation }) 
 
         <View style={[styles.row, { alignItems: 'flex-end' }]}>
           <SectionLabel text="Recent Transactions" />
-          {history.length > 5 && <TouchableOpacity onPress={() => navigation?.navigate('Transactions')}><Text style={[styles.fNorm, { fontSize: 12, color: '#8ce629', marginBottom: 10 }]}>See all</Text></TouchableOpacity>}
+          {history.length > 5 && <TouchableOpacity onPress={() => navigation?.navigate('History')}><Text style={[styles.fNorm, { fontSize: 12, color: '#8ce629', marginBottom: 10 }]}>See all</Text></TouchableOpacity>}
         </View>
 
         {history.length === 0 ? (
@@ -129,7 +129,7 @@ export const DashboardScreen: React.FC<{ navigation?: any }> = ({ navigation }) 
         <View style={{ height: 80 }} />
       </ScrollView>
 
-      <TouchableOpacity style={styles.fab} activeOpacity={0.85} onPress={() => navigation?.navigate('AddTransaction')}><Text style={[styles.fBold, { fontSize: 32, color: '#0d0d0d', lineHeight: 36 }]}>+</Text></TouchableOpacity>
+      <TouchableOpacity style={styles.fab} activeOpacity={0.85} onPress={() => navigation?.navigate('Add')}><Text style={[styles.fBold, { fontSize: 32, color: '#0d0d0d', lineHeight: 36 }]}>+</Text></TouchableOpacity>
     </View>
   );
 };
