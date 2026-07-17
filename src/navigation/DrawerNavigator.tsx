@@ -3,6 +3,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import TabNavigator from './TabNavigator';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import HistoryScreen from '../screens/transactions/HistoryScreen';
+import SettingsScreen from '../screens/profile/SettingsScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -31,8 +32,15 @@ const DrawerNavigator = ({ route }: any) => {
         name="SideProfile" 
         component={ProfileScreen} 
         initialParams={{ userId }} 
+        options={{ drawerLabel: 'Profile' }}
+      />
+      <Drawer.Screen 
+        name="SideSettings" 
+        component={SettingsScreen} 
+        initialParams={{ userId }} 
         options={{ drawerLabel: 'Settings' }}
       />
+
       <Drawer.Screen 
         name="SideHistory" 
         component={HistoryScreen} 
