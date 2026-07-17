@@ -10,7 +10,8 @@ import BudgetScreen from '../screens/dashboard/BudgetScreen';
 
 const Tab = createBottomTabNavigator();
 
-const TabNavigator = () => {
+const TabNavigator = ({ route }: any) => {
+  const { userId } = route.params || {};
   return (
     <Tab.Navigator
       screenOptions={{
@@ -23,23 +24,27 @@ const TabNavigator = () => {
     >
       <Tab.Screen 
         name="Dashboard" 
-        component={DashboardScreen} 
+        component={DashboardScreen}
+        initialParams={{ userId }}
       />
       
       <Tab.Screen 
         name="History" 
-        component={HistoryScreen} 
+        component={HistoryScreen}
+        initialParams={{ userId }}
       />
       
       <Tab.Screen 
         name="Add" 
-        component={AddTransactionScreen} 
+        component={AddTransactionScreen}
+        initialParams={{ userId }}
       />
 
       {/* Embedded directly here so it retains the bottom tab bar layout */}
       <Tab.Screen 
         name="Budget" 
-        component={BudgetScreen} 
+        component={BudgetScreen}
+        initialParams={{ userId }}
         options={{
           title: 'Budget',
         }}
@@ -47,7 +52,8 @@ const TabNavigator = () => {
 
       <Tab.Screen 
         name="Profile" 
-        component={ProfileScreen} 
+        component={ProfileScreen}
+        initialParams={{ userId }}
       />
     </Tab.Navigator>
   );

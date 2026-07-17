@@ -30,8 +30,8 @@ const TransactionRow: React.FC<{ item: Transaction }> = ({ item }) => {
   );
 };
 
-export const DashboardScreen: React.FC<{ navigation?: any }> = ({ navigation }) => {
-  const USER_ID = 1;
+export const DashboardScreen: React.FC<{ navigation?: any; route?: any }> = ({ navigation, route }) => {
+  const USER_ID = route?.params?.userId ?? 1;
   const [history, setHistory] = useState<Transaction[]>([]);
   const [metrics, setMetrics] = useState<DashboardMetrics>({ current_balance: 0, total_income: 0, total_expenses: 0, remaining_budget: 0, monthly_budget_limit: 0 });
 
