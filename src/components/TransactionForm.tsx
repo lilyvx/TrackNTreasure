@@ -21,6 +21,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
   });
 
   const inputRef = useRef<TextInput>(null);
+  const [displayAmount, setDisplayAmount] = useState('0.00');
 
   const handleInputChange = (field: keyof TransactionFormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -59,6 +60,23 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
       type: 'Expense',
       transaction_date: new Date().toISOString().split('T')[0],
     });
+    setDisplayAmount('0.00');
+  };
+  
+  //while user is actively typing
+  const handleAmountChange = (val: string) => {
+    handleInputChange('amount', val);
+    setDisplayAmount(val); 
+  };
+
+  //when user taps away from the hidden input (2 decimal places)
+  const handleAmountBlur = () => {
+    const num = parseFloat(form.amount);
+    if (!isNaN(num) && num > 0) {
+      setDisplayAmount(num.toFixed(2)); 
+    } else {
+      setDisplayAmount('0.00'); 
+    }
   };
 
   const activeCategories = form.type === 'Income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
@@ -90,7 +108,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
       <Text style={styles.label}>Amount</Text>
       <TouchableOpacity style={styles.amountCard} activeOpacity={0.8} onPress={() => inputRef.current?.focus()}>
         <Text style={styles.amountCurrency}>RM </Text>
-        <Text style={styles.amountValue}>{form.amount || '0.00'}</Text>
+        <Text style={styles.amountValue}>{displayAmount}</Text>
       </TouchableOpacity>
 
       <TextInput
@@ -98,7 +116,8 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSave }) => {
         style={styles.hiddenInput}
         keyboardType="numeric"
         value={form.amount}
-        onChangeText={(val) => handleInputChange('amount', val)}
+        onChangeText={handleAmountChange}
+        onBlur={handleAmountBlur}
       />
 
       {/* category selection */}
