@@ -1,4 +1,5 @@
 import React from 'react';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text,View,Platform, TouchableOpacity, StyleSheet} from 'react-native';
 import { DashboardScreen } from '../screens/dashboard/DashboardScreen'; //  Fixed with curly braces!
@@ -26,18 +27,33 @@ const TabNavigator = ({ route }: any) => {
         name="Dashboard" 
         component={DashboardScreen}
         initialParams={{ userId }}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="home-outline" size={size} color={color} />
+          ),
+        }}
       />
       
       <Tab.Screen 
         name="History" 
         component={HistoryScreen}
         initialParams={{ userId }}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="time-outline" size={size} color={color} />
+          ),
+        }}
       />
       
       <Tab.Screen 
         name="Add" 
         component={AddTransactionScreen}
         initialParams={{ userId }}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="add-circle-outline" size={size} color={color} />
+          ),
+        }}
       />
 
       {/* Embedded directly here so it retains the bottom tab bar layout */}
@@ -47,6 +63,9 @@ const TabNavigator = ({ route }: any) => {
         initialParams={{ userId }}
         options={{
           title: 'Budget',
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="wallet-outline" size={size} color={color} />
+          ),
         }}
       />
 
@@ -54,6 +73,11 @@ const TabNavigator = ({ route }: any) => {
         name="Profile" 
         component={ProfileScreen}
         initialParams={{ userId }}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="person-outline" size={size} color={color} />
+          ),
+        }}
       />
     </Tab.Navigator>
   );
